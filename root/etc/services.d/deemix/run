@@ -1,0 +1,33 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+UMASK_SET=${UMASK_SET:-022}
+umask "$UMASK_SET"
+
+cd /
+
+# Check if an alternative port was defined, set it to it or default
+if [ -n "${INTPORT}" ]; then
+    port=$INTPORT
+else
+    port=6595
+fi
+
+# Check if the ARL environment var is set to anything. This enables legacy behavior
+if [ -n "${ARL}" ]; then
+    export DEEMIX_SINGLE_USER=true
+fi
+
+export DEEMIX_DATA_DIR=/config_deemix/
+export DEEMIX_MUSIC_DIR=/downloads/
+export DEEMIX_SERVER_PORT=$port
+export DEEMIX_HOST=0.0.0.0
+
+if [ ! -f $DEEMIX_DATA_DIR/config.json ] && [ "$AUTOCONFIG" = "true" ]; then
+    echo "[services.d] Copying deemix configuration"
+    cp -f /etc/services.d/deemix/config.json $DEEMIX_DATA_DIR/config.json
+fi
+chown -R "$PUID:$PGID" /config_deemix
+
+echo "[services.d] Starting Deemix"
+s6-setuidgid "$PUID:$PGID" /deemix-server

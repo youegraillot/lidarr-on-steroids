@@ -1,0 +1,89 @@
+#!/usr/bin/with-contenv sh
+# shellcheck shell=sh
+
+echo "
+----------------------------------------------------------------------
+Flac2MP3 SETUP
+----------------------------------------------------------------------
+PUID=$PUID
+PGID=$PGID
+----------------------------------------------------------------------
+"
+
+if [ "$(stat -c '%g' /usr/local/bin/flac2mp3.sh)" != "$PGUID" ]; then
+    echo "Changing ownership on scripts."
+    chown "$PUID:$PGID" /usr/local/bin/flac2*.sh
+fi
+
+if [ ! -x /usr/local/bin/flac2mp3.sh ]; then
+    echo "Making scripts executable."
+    chmod +x /usr/local/bin/flac2*.sh
+fi
+
+echo "
+----------------------------------------------------------------------
+LIDARR SETUP
+----------------------------------------------------------------------
+Source=$urlPlugin
+----------------------------------------------------------------------
+"
+
+url="http://localhost:8686"
+urlPlugin="https://github.com/ta264/Lidarr.Plugin.Deemix"
+
+# string, route
+isPresent() {
+    apiCall "GET" "$2" | grep -q "$1"
+}
+
+# method, route, payload
+apiCall() {
+    curl \
+        -sS \
+        -X "$1" \
+        -H "Content-Type: application/json" \
+        -H "X-Api-Key: $apiKey" \
+        -d "$3" \
+        $url/api/v1/"$2"
+    return 0
+}
+
+apiKey="$(curl \
+    -sS \
+    --retry-all-errors \
+    --retry 10 \
+    $url/initialize.js |
+    sed -n "s/apiKey: '\(.*\)'.*/\1/p")"
+
+if isPresent $urlPlugin "system/plugins"; then
+    echo "Plugin already installed"
+else
+    echo "Installing plugin"
+    apiCall "POST" "command" '{"name":"InstallPlugin","githubUrl":"'$urlPlugin'"}'
+fi
+
+if [ "$AUTOCONFIG" = "true" ]; then
+    loginPath="/config_deemix/login.json"
+    echo "Waiting for $loginPath to be filled..."
+    while [ -z "$arl" ]; do
+        sleep 1
+        arl=$(sed -n 's/.*arl.*"\(.*\)"/\1/p' "$loginPath" 2>/dev/null)
+    done
+    if [ "$(apiCall "GET" "delayprofile" | jq .[0].items[2].allowed)" = "false" ]; then
+        echo "Allowing Deemix in default delay profile"
+        apiCall "PUT" "delayprofile/1" \
+            '{"name":"Default","items":[{"name":"Usenet","protocol":"UsenetDownloadProtocol","allowed":true,"delay":0},{"name":"Torrent","protocol":"TorrentDownloadProtocol","allowed":true,"delay":0},{"name":"Deemix","protocol":"DeemixDownloadProtocol","allowed":true,"delay":0}],"tags":[],"id":1}'
+    fi
+    if ! isPresent "Deemix" "indexer"; then
+        loginPath="/config_deemix/login.json"
+        echo "Updating indexer"
+        apiCall "POST" "indexer" \
+            '{"enableRss":true,"enableAutomaticSearch":true,"enableInteractiveSearch":true,"supportsRss":true,"supportsSearch":true,"protocol":"DeemixDownloadProtocol","priority":25,"downloadClientId":0,"name":"Deemix","fields":[{"name":"baseUrl","value":"http://localhost:6595"},{"name":"arl","value":"'"$arl"'"},{"name":"earlyReleaseLimit"}],"implementationName":"Deemix","implementation":"Deemix","configContract":"DeemixIndexerSettings","infoLink":"https://wiki.servarr.com/lidarr/supported#deemix","tags":[]}'
+    fi
+    if ! isPresent "Deemix" "downloadclient"; then
+        echo "Updating download client"
+        apiCall "POST" "downloadclient" \
+            '{"enable":true,"protocol":"DeemixDownloadProtocol","priority":1,"removeCompletedDownloads":true,"removeFailedDownloads":true,"name":"Deemix","fields":[{"name":"host","value":"localhost"},{"name":"port","value":6595},{"name":"urlBase"},{"name":"useSsl","value":false},{"name":"arl","value":"'"$arl"'"}],"implementationName":"Deemix","implementation":"Deemix","configContract":"DeemixSettings","infoLink":"https://wiki.servarr.com/lidarr/supported#deemix","tags":[]}'
+    fi
+    echo "Configuration is up to date"
+fi

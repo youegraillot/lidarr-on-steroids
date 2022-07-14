@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  lidarr-onsteroids:
+    image: lidarr-onsteroids
+    build:
+      context: .
+    environment:
+      - PUID=1000
+      - PGID=100
+      - AUTOCONFIG=true
+    ports:
+      - "8686:8686"
+      - "6595:6595"
+    volumes:
+      - ./config:/config
+      - ./config_deemix:/config_deemix
+      - ./downloads:/downloads
+    restart: unless-stopped

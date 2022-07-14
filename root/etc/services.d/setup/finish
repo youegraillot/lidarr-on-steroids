@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv sh
+# shellcheck shell=sh
+
+SUPERVISED_DIR=/var/run/s6/services
+
+# hack: this is run-once service
+# stop the s6-supervise process and ensure that its not started again
+s6-svc -x ${SUPERVISED_DIR}/setup
+rm -rf ${SUPERVISED_DIR}/setup
+s6-svscanctl -a ${SUPERVISED_DIR}
