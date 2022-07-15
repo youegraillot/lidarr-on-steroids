@@ -1,4 +1,4 @@
-# [lidarr-on-steroids](https://github.com/youegraillot/lidarr-on-sterois/)
+# [lidarr-on-steroids](https://github.com/youegraillot/lidarr-on-steroids/)
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/youegraillot/lidarr-on-steroids?style=for-the-badge&logo=github)](https://github.com/youegraillot/lidarr-on-steroids)
 [![Latest tag](https://img.shields.io/docker/v/youegraillot/lidarr-on-steroids?style=for-the-badge&logo=docker)](https://hub.docker.com/r/youegraillot/lidarr-on-steroids)
@@ -47,7 +47,7 @@ docker run \
 version: "3"
 services:
   lidarr:
-    image: youegraillot/lidarr-on-sterois
+    image: youegraillot/lidarr-on-steroids
     restart: unless-stopped
     ports:
       - "8686:8686" # Lidarr web UI
