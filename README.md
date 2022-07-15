@@ -25,6 +25,7 @@ This allows an easy deployment, with the advantage of having a direct control ov
 | `-e PUID=1000` | for UserID |
 | `-e PGID=1000` | for GroupID |
 | `-e AUTOCONFIG=true` | Enable automatic configuration - see below for explanation |
+| `-e FLAC2CUSTOM_ARGS=true` | Sets arguments used when calling flac2custom.sh |
 | `-v /config` | Configuration files for Lidarr. |
 | `-v /config_deemix` | Configuration files for Deemix. |
 | `-v /downloads` | Path to your download folder for music. |
@@ -79,9 +80,9 @@ In case you don't want the automagical part (which is really the only value of t
 
 ## Audio files conversion
 
-The image uses a modded version of [lidarr-flac2mp3](https://github.com/TheCaptain989/lidarr-flac2mp3) allowing conversion from any format.
+The image uses a modded version of lidarr-flac2mp3 allowing conversion from any format.
 
-To enable conversion on Lidarr import, create a new Connection to a Custom Script. You can also provide your own custom conversion script here, see [lidarr-flac2mp3](https://github.com/TheCaptain989/lidarr-flac2mp3) for mode information.
+To enable conversion on Lidarr import, create a new Connection to a Custom Script. You can also provide your own custom conversion script here, see [lidarr-flac2mp3](https://github.com/youegraillot/lidarr-flac2mp3) for mode information.
 
 !["Lidarr custom script settings"](https://github.com/youegraillot/lidarr-on-steroids/raw/main/.assets/lidarr-custom-script.jpg "Lidarr custom script settings")
 
