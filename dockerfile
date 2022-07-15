@@ -4,6 +4,8 @@ LABEL maintainer="youegraillot"
 
 ENV DEEMIX_SINGLE_USER=true
 ENV AUTOCONFIG=true
+ENV PUID=1000
+ENV PGID=1000
 
 # flac2mp3
 COPY lidarr-flac2mp3/root/usr /usr
@@ -13,9 +15,9 @@ RUN apk add --no-cache ffmpeg && \
 # deemix
 COPY --from=registry.gitlab.com/bockiii/deemix-docker:latest /deemix-server /deemix-server
 RUN chmod +x /deemix-server
-VOLUME [ "/config_deemix" "/downloads" ]
+VOLUME "/config_deemix" "/downloads"
 EXPOSE 6595
 
 COPY root /
-VOLUME "/config"
+VOLUME "/config" "/music"
 EXPOSE 6595 8686
