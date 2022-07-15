@@ -5,10 +5,14 @@
 [![Docker pulls](https://img.shields.io/docker/pulls/youegraillot/lidarr-on-steroids?style=for-the-badge&logo=docker)](https://hub.docker.com/r/youegraillot/lidarr-on-steroids)
 
 This repository bundles a modded version of Lidarr and Deemix into a docker image featuring :
-  - Deemix with integration as an indexer and downloader for Lidarr
+  - Native Deemix integration as an indexer and downloader for Lidarr
   - Automatic Lidarr and Deemix configuration
   - Automatic conversion from any format with ffmpeg
   - Podman compatibility with rootless mode
+
+This allows an easy deployment, with the advantage of having a direct control over Deemix indexing and downloader capacities into Lidarr :
+
+!["Lidarr indexers"](https://github.com/youegraillot/lidarr-on-steroids/raw/main/.assets/lidarr-indexers.jpg "Lidarr indexers")
 
 ## Usage
 
@@ -79,7 +83,7 @@ The image uses a modded version of [lidarr-flac2mp3](https://github.com/TheCapta
 
 To enable conversion on Lidarr import, create a new Connection to a Custom Script. You can also provide your own custom conversion script here, see [lidarr-flac2mp3](https://github.com/TheCaptain989/lidarr-flac2mp3) for mode information.
 
-!["Lidarr custom script settings"](https://github.com/youegraillot/lidarr-on-steroids/raw/main/.assets/lidarr-custom-script.png "Lidarr custom script settings")
+!["Lidarr custom script settings"](https://github.com/youegraillot/lidarr-on-steroids/raw/main/.assets/lidarr-custom-script.jpg "Lidarr custom script settings")
 
 ## Acknowledgment
 
