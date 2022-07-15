@@ -1,4 +1,12 @@
 version: 2
+
+registries:
+  gitlab:
+    type: docker-registry
+    url: https://registry.gitlab.com
+    username: ${{secrets.GITLAB_USERNAME}}
+    password: ${{secrets.GITLAB_TOKEN}}
+
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -7,6 +15,8 @@ updates:
 
   - package-ecosystem: "docker"
     directory: "/"
+    registries:
+      - gitlab
     schedule:
       interval: "daily"
 
