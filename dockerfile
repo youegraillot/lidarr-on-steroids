@@ -1,4 +1,4 @@
-FROM cr.hotio.dev/hotio/lidarr:pr-plugins-1.0.2.2619
+FROM cr.hotio.dev/hotio/lidarr:pr-plugins-1.1.0.2622
 
 LABEL maintainer="youegraillot"
 
