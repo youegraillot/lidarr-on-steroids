@@ -79,7 +79,7 @@ The image uses a modded version of [lidarr-flac2mp3](https://github.com/TheCapta
 
 To enable conversion on Lidarr import, create a new Connection to a Custom Script. You can also provide your own custom conversion script here, see [lidarr-flac2mp3](https://github.com/TheCaptain989/lidarr-flac2mp3) for mode information.
 
-!["Lidarr custom script settings"](.assets/lidarr-custom-script.png "Lidarr custom script settings")
+!["Lidarr custom script settings"](https://github.com/youegraillot/lidarr-on-steroids/raw/main/.assets/lidarr-custom-script.png "Lidarr custom script settings")
 
 ## Acknowlegment
 
