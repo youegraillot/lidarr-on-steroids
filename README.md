@@ -81,7 +81,7 @@ To enable conversion on Lidarr import, create a new Connection to a Custom Scrip
 
 !["Lidarr custom script settings"](https://github.com/youegraillot/lidarr-on-steroids/raw/main/.assets/lidarr-custom-script.png "Lidarr custom script settings")
 
-## Acknowlegment
+## Acknowledgment
 
 This project is just a compilation of various tools made possible by those projects :
 
@@ -90,4 +90,4 @@ This project is just a compilation of various tools made possible by those proje
 - [Deemix](https://deemix.app/) for the downloader backend
 - [hotio](https://hotio.dev/) for the base docker image
 
-Alternatively you could use [Deemixrr](https://github.com/TheUltimateC0der/deemixrr) which pretty much offers the same functionalities without the *starr of the various Sonarr forks.
+Alternatively, you could use [Deemixrr](https://github.com/TheUltimateC0der/deemixrr) which pretty much offers the same functionalities without the *starr of the various Sonarr forks.
