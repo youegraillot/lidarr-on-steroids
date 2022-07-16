@@ -21,6 +21,16 @@ apiCall() {
     return 0
 }
 
+if [ "$(stat -c '%g' /usr/local/bin/clean-downloads.sh)" != "$PGUID" ]; then
+    echo "Changing ownership on scripts."
+    chown "$PUID:$PGID" /usr/local/bin/*.sh
+fi
+
+if [ ! -x /usr/local/bin/clean-downloads.sh ]; then
+    echo "Making scripts executable."
+    chmod +x /usr/local/bin/*.sh
+fi
+
 echo "
 ----------------------------------------------------------------------
 LIDARR SETUP
@@ -83,16 +93,6 @@ FLAC2CUSTOM_ARGS=$FLAC2CUSTOM_ARGS
 ----------------------------------------------------------------------
 "
 
-if [ "$(stat -c '%g' /usr/local/bin/flac2mp3.sh)" != "$PGUID" ]; then
-    echo "Changing ownership on scripts."
-    chown "$PUID:$PGID" /usr/local/bin/flac2*.sh
-fi
-
-if [ ! -x /usr/local/bin/flac2mp3.sh ]; then
-    echo "Making scripts executable."
-    chmod +x /usr/local/bin/flac2*.sh
-fi
-
 if [ "$AUTOCONFIG" = "true" ]; then
     if [ -n "$FLAC2CUSTOM_ARGS" ]; then
         echo "[autoconfig] FLAC2CUSTOM_ARGS is set"
@@ -110,6 +110,7 @@ Utilities SETUP
 AUTOCONFIG=$AUTOCONFIG
 ----------------------------------------------------------------------
 "
+
 if [ "$AUTOCONFIG" = "true" ]; then
     if ! isPresent "Clean Downloads" "notification"; then
         echo "[autoconfig] Configuring flac2custom.sh custom script"
