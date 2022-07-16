@@ -70,7 +70,7 @@ Deemix comes with optimal settings allowing Lidarr integration, in particular re
 
 The `setup` service will install the Deemix plugin. This requires Lidarr to be restarted once.
 
-The only manual manipulation you'll have to do is filling your Deezer credentials in Deemix web UI (port [6595](http://localhost:6595) by default). Once the `/config_deemix/login.json` is filled with the resulting ARL, the `setup` will be able to create the following :
+In `AUTOCONFIG` mode (default), the only manual manipulation you'll only have to fill your Deezer credentials in Deemix web UI (port [6595](http://localhost:6595) by default). Once the `/config_deemix/login.json` is filled with the resulting ARL, the `setup` will be able to create the following :
   - /music root folder if no other root folder is configured
   - Delay profile allowing Deemix to be used by automatic search
   - Deemix as an indexer
@@ -85,7 +85,7 @@ The image uses a modded version of lidarr-flac2mp3 allowing conversion from any 
 
 To enable conversion on Lidarr import, create a new Connection to a Custom Script. You can also provide your own custom conversion script, see [lidarr-flac2mp3](https://github.com/youegraillot/lidarr-flac2mp3) for more information.
 
-If `AUTOCONFIG` is set to `true` (default) and you have set `FLAC2CUSTOM_ARGS`, this step done for you :
+In `AUTOCONFIG`, if `FLAC2CUSTOM_ARGS` is set and no other connection to flac2* is found, this step done for you :
 
 !["Lidarr custom script settings"](https://github.com/youegraillot/lidarr-on-steroids/raw/main/.assets/lidarr-custom-script.png "Lidarr custom script settings")
 
