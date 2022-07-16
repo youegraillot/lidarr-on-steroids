@@ -76,6 +76,7 @@ In `AUTOCONFIG` mode (default), the only manual manipulation you'll only have to
   - Deemix as an indexer
   - Deemix as a download client
   - Flac2Custom script connection if `FLAC2CUSTOM_ARGS` is set
+  - clean-downloads script connection to keep your downloads folder *clean* after each imports
 
 In case you don't want the automagical part (which is really the only value of this image), just set `AUTOCONFIG` environment variable to `false`.
 
