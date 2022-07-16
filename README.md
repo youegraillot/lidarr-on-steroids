@@ -33,7 +33,7 @@ This allows an easy deployment, with the advantage of having a direct control ov
 
 ### Docker Run
 
-```shell
+```sh
 docker run \
   --name lidarr \
   -p 8686:8686 \
@@ -75,6 +75,7 @@ The only manual manipulation you'll have to do is filling your Deezer credential
   - Delay profile allowing Deemix to be used by automatic search
   - Deemix as an indexer
   - Deemix as a download client
+  - Flac2Custom script connection if `FLAC2CUSTOM_ARGS` is set
 
 In case you don't want the automagical part (which is really the only value of this image), just set `AUTOCONFIG` environment variable to `false`.
 
@@ -82,13 +83,15 @@ In case you don't want the automagical part (which is really the only value of t
 
 The image uses a modded version of lidarr-flac2mp3 allowing conversion from any format.
 
-To enable conversion on Lidarr import, create a new Connection to a Custom Script. You can also provide your own custom conversion script here, see [lidarr-flac2mp3](https://github.com/youegraillot/lidarr-flac2mp3) for mode information.
+To enable conversion on Lidarr import, create a new Connection to a Custom Script. You can also provide your own custom conversion script, see [lidarr-flac2mp3](https://github.com/youegraillot/lidarr-flac2mp3) for more information.
+
+If `AUTOCONFIG` is set to `true` (default) and you have set `FLAC2CUSTOM_ARGS`, this step done for you :
 
 !["Lidarr custom script settings"](https://github.com/youegraillot/lidarr-on-steroids/raw/main/.assets/lidarr-custom-script.png "Lidarr custom script settings")
 
 ## Acknowledgment
 
-This project is just a compilation of various tools made possible by those projects :
+This project is just a compilation of various tools made possible by these projects :
 
 - [Lidarr](https://github.com/Lidarr/Lidarr) and especially [ta264](https://github.com/ta264) for the plugin integration
 - [lidarr-flac2mp3](https://github.com/TheCaptain989/lidarr-flac2mp3) for the format conversion script
