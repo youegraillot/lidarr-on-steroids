@@ -52,6 +52,11 @@ if [ "$AUTOCONFIG" = "true" ]; then
 
     if ! isPresent $urlPlugin "system/plugins"; then
         echo "[autoconfig] Installing plugin"
+        githubRate=$(curl -s https://api.github.com/rate_limit | jq .rate)
+        if [ "$(echo "$githubRate" | jq .remaining)" = "60" ]; then
+            echo "[autoconfig] Waiting github rate limit reset"
+            sleep $(( $(echo "$githubRate" | jq .reset) - $(date +%s) + 5 ))
+        fi
         apiCall "POST" "command" '{"name":"InstallPlugin","githubUrl":"'$urlPlugin'"}'
     fi
     if ! isPresent "path" "rootFolder"; then
