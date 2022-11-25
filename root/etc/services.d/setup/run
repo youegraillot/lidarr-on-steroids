@@ -31,6 +31,17 @@ if [ ! -x /usr/local/bin/clean-downloads.sh ]; then
     chmod +x /usr/local/bin/*.sh
 fi
 
+if [ "$(stat -c '%g' /music)" != "$PGUID" ]; then
+    echo "Changing ownership of /music"
+    chown "$PUID:$PGID" /music
+fi
+
+if [ "$(stat -c '%g' /downloads)" != "$PGUID" ]; then
+    echo "Changing ownership of /downloads"
+    chown "$PUID:$PGID" /downloads
+fi
+
+
 echo "
 ----------------------------------------------------------------------
 LIDARR SETUP
