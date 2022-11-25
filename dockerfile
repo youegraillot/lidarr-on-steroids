@@ -1,6 +1,6 @@
 FROM registry.gitlab.com/bockiii/deemix-docker:latest@sha256:0462f4be1e04866c3efc999aa0571ec98f3aced99793a9b586f1a36f2b97febe as deemix
 
-FROM cr.hotio.dev/hotio/lidarr:pr-plugins-1.1.0.2629
+FROM cr.hotio.dev/hotio/lidarr:pr-plugins-1.1.2.2826
 
 LABEL maintainer="youegraillot"
 
