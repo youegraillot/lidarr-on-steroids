@@ -1,6 +1,19 @@
 #!/usr/bin/with-contenv sh
 # shellcheck shell=sh
 
+# One-shot service
+# https://github.com/just-containers/s6-overlay/issues/86
+
+s6-svc -O /var/run/service/setup
+
+echo "
+----------------------------------------------------------------------
+SETUP
+----------------------------------------------------------------------
+AUTOCONFIG=$AUTOCONFIG
+----------------------------------------------------------------------
+"
+
 url="http://localhost:8686"
 urlPlugin="https://github.com/ta264/Lidarr.Plugin.Deemix"
 
@@ -41,6 +54,9 @@ if [ "$(stat -c '%g' /downloads)" != "$PGUID" ]; then
     chown "$PUID:$PGID" /downloads
 fi
 
+if [ "$AUTOCONFIG" != "true" ]; then
+    exit
+fi
 
 echo "
 ----------------------------------------------------------------------
@@ -49,55 +65,53 @@ LIDARR SETUP
 PluginSource=$urlPlugin
 ----------------------------------------------------------------------
 "
-if [ "$AUTOCONFIG" = "true" ]; then
-    echo "[autoconfig] Waiting Lidarr to launch on 8686..."
-    while ! nc -z localhost 8686; do
-        sleep 0.1
-    done
-    apiKey="$(curl \
-        -sS \
-        --retry-all-errors \
-        --retry 10 \
-        $url/initialize.js |
-        sed -n "s/apiKey: '\(.*\)'.*/\1/p")"
+echo "[autoconfig] Waiting Lidarr to launch on 8686..."
+while ! nc -z localhost 8686; do
+    sleep 0.1
+done
+apiKey="$(curl \
+    -sS \
+    --retry-all-errors \
+    --retry 10 \
+    $url/initialize.js |
+    sed -n "s/apiKey: '\(.*\)'.*/\1/p")"
 
-    if ! isPresent $urlPlugin "system/plugins"; then
-        echo "[autoconfig] Installing plugin"
-        githubRate=$(curl -s https://api.github.com/rate_limit | jq .rate)
-        if [ "$(echo "$githubRate" | jq .remaining)" = "60" ]; then
-            echo "[autoconfig] Waiting github rate limit reset"
-            sleep $(( $(echo "$githubRate" | jq .reset) - $(date +%s) + 5 ))
-        fi
-        apiCall "POST" "command" '{"name":"InstallPlugin","githubUrl":"'$urlPlugin'"}'
+if ! isPresent $urlPlugin "system/plugins"; then
+    echo "[autoconfig] Installing plugin"
+    githubRate=$(curl -s https://api.github.com/rate_limit | jq .rate)
+    if [ "$(echo "$githubRate" | jq .remaining)" = "60" ]; then
+        echo "[autoconfig] Waiting github rate limit reset"
+        sleep $(( $(echo "$githubRate" | jq .reset) - $(date +%s) + 5 ))
     fi
-    if ! isPresent "path" "rootFolder"; then
-        echo "[autoconfig] Setting /music rootFolder"
-        apiCall "POST" "rootFolder" '{"defaultTags":[],"defaultQualityProfileId":1,"defaultMetadataProfileId":1,"path":"/music","name":"Music"}'
-    fi
-    loginPath="/config_deemix/login.json"
-    echo "[autoconfig] Waiting for $loginPath to be filled..."
-    while [ -z "$arl" ]; do
-        sleep 1
-        arl=$(sed -n 's/.*arl.*"\(.*\)"/\1/p' "$loginPath" 2>/dev/null)
-    done
-    if [ "$(apiCall "GET" "delayprofile" | jq .[0].items[2].allowed)" = "false" ]; then
-        echo "[autoconfig] Allowing Deemix in default delay profile"
-        apiCall "PUT" "delayprofile/1" \
-            '{"name":"Default","items":[{"name":"Usenet","protocol":"UsenetDownloadProtocol","allowed":true,"delay":0},{"name":"Torrent","protocol":"TorrentDownloadProtocol","allowed":true,"delay":0},{"name":"Deemix","protocol":"DeemixDownloadProtocol","allowed":true,"delay":0}],"tags":[],"id":1}'
-    fi
-    if ! isPresent "Deemix" "indexer"; then
-        loginPath="/config_deemix/login.json"
-        echo "[autoconfig] Updating indexer"
-        apiCall "POST" "indexer" \
-            '{"enableRss":true,"enableAutomaticSearch":true,"enableInteractiveSearch":true,"supportsRss":true,"supportsSearch":true,"protocol":"DeemixDownloadProtocol","priority":25,"downloadClientId":0,"name":"Deemix","fields":[{"name":"baseUrl","value":"http://localhost:6595"},{"name":"arl","value":"'"$arl"'"},{"name":"earlyReleaseLimit"}],"implementationName":"Deemix","implementation":"Deemix","configContract":"DeemixIndexerSettings","infoLink":"https://wiki.servarr.com/lidarr/supported#deemix","tags":[]}'
-    fi
-    if ! isPresent "Deemix" "downloadclient"; then
-        echo "[autoconfig] Updating download client"
-        apiCall "POST" "downloadclient" \
-            '{"enable":true,"protocol":"DeemixDownloadProtocol","priority":1,"removeCompletedDownloads":true,"removeFailedDownloads":true,"name":"Deemix","fields":[{"name":"host","value":"localhost"},{"name":"port","value":6595},{"name":"urlBase"},{"name":"useSsl","value":false},{"name":"arl","value":"'"$arl"'"}],"implementationName":"Deemix","implementation":"Deemix","configContract":"DeemixSettings","infoLink":"https://wiki.servarr.com/lidarr/supported#deemix","tags":[]}'
-    fi
-    echo "[autoconfig] Configuration is up to date"
+    apiCall "POST" "command" '{"name":"InstallPlugin","githubUrl":"'$urlPlugin'"}'
 fi
+if ! isPresent "path" "rootFolder"; then
+    echo "[autoconfig] Setting /music rootFolder"
+    apiCall "POST" "rootFolder" '{"defaultTags":[],"defaultQualityProfileId":1,"defaultMetadataProfileId":1,"path":"/music","name":"Music"}'
+fi
+loginPath="/config_deemix/login.json"
+echo "[autoconfig] Waiting for $loginPath to be filled..."
+while [ -z "$arl" ]; do
+    sleep 1
+    arl=$(sed -n 's/.*arl.*"\(.*\)"/\1/p' "$loginPath" 2>/dev/null)
+done
+if [ "$(apiCall "GET" "delayprofile" | jq .[0].items[2].allowed)" = "false" ]; then
+    echo "[autoconfig] Allowing Deemix in default delay profile"
+    apiCall "PUT" "delayprofile/1" \
+        '{"name":"Default","items":[{"name":"Usenet","protocol":"UsenetDownloadProtocol","allowed":true,"delay":0},{"name":"Torrent","protocol":"TorrentDownloadProtocol","allowed":true,"delay":0},{"name":"Deemix","protocol":"DeemixDownloadProtocol","allowed":true,"delay":0}],"tags":[],"id":1}'
+fi
+if ! isPresent "Deemix" "indexer"; then
+    loginPath="/config_deemix/login.json"
+    echo "[autoconfig] Updating indexer"
+    apiCall "POST" "indexer" \
+        '{"enableRss":true,"enableAutomaticSearch":true,"enableInteractiveSearch":true,"supportsRss":true,"supportsSearch":true,"protocol":"DeemixDownloadProtocol","priority":25,"downloadClientId":0,"name":"Deemix","fields":[{"name":"baseUrl","value":"http://localhost:6595"},{"name":"arl","value":"'"$arl"'"},{"name":"earlyReleaseLimit"}],"implementationName":"Deemix","implementation":"Deemix","configContract":"DeemixIndexerSettings","infoLink":"https://wiki.servarr.com/lidarr/supported#deemix","tags":[]}'
+fi
+if ! isPresent "Deemix" "downloadclient"; then
+    echo "[autoconfig] Updating download client"
+    apiCall "POST" "downloadclient" \
+        '{"enable":true,"protocol":"DeemixDownloadProtocol","priority":1,"removeCompletedDownloads":true,"removeFailedDownloads":true,"name":"Deemix","fields":[{"name":"host","value":"localhost"},{"name":"port","value":6595},{"name":"urlBase"},{"name":"useSsl","value":false},{"name":"arl","value":"'"$arl"'"}],"implementationName":"Deemix","implementation":"Deemix","configContract":"DeemixSettings","infoLink":"https://wiki.servarr.com/lidarr/supported#deemix","tags":[]}'
+fi
+echo "[autoconfig] Configuration is up to date"
 
 echo "
 ----------------------------------------------------------------------
@@ -109,13 +123,11 @@ FLAC2CUSTOM_ARGS=$FLAC2CUSTOM_ARGS
 ----------------------------------------------------------------------
 "
 
-if [ "$AUTOCONFIG" = "true" ]; then
-    if [ -n "$FLAC2CUSTOM_ARGS" ]; then
-        echo "[autoconfig] FLAC2CUSTOM_ARGS is set"
-        if ! isPresent "flac2" "notification"; then
-            echo "[autoconfig] Configuring flac2custom.sh custom script"
-            apiCall "POST" "notification" '{"onGrab":false,"onReleaseImport":true,"onUpgrade":true,"onRename":false,"onHealthIssue":false,"onDownloadFailure":false,"onImportFailure":false,"onTrackRetag":false,"onApplicationUpdate":false,"supportsOnGrab":true,"supportsOnReleaseImport":true,"supportsOnUpgrade":true,"supportsOnRename":true,"supportsOnHealthIssue":true,"includeHealthWarnings":false,"supportsOnDownloadFailure":false,"supportsOnImportFailure":false,"supportsOnTrackRetag":true,"supportsOnApplicationUpdate":true,"name":"Flac2Custom","fields":[{"name":"path","value":"/usr/local/bin/flac2custom.sh"},{"name":"arguments"}],"implementationName":"Custom Script","implementation":"CustomScript","configContract":"CustomScriptSettings","infoLink":"","message":{"message":"","type":"warning"},"tags":[]}'
-        fi
+if [ -n "$FLAC2CUSTOM_ARGS" ]; then
+    echo "[autoconfig] FLAC2CUSTOM_ARGS is set"
+    if ! isPresent "flac2" "notification"; then
+        echo "[autoconfig] Configuring flac2custom.sh custom script"
+        apiCall "POST" "notification" '{"onGrab":false,"onReleaseImport":true,"onUpgrade":true,"onRename":false,"onHealthIssue":false,"onDownloadFailure":false,"onImportFailure":false,"onTrackRetag":false,"onApplicationUpdate":false,"supportsOnGrab":true,"supportsOnReleaseImport":true,"supportsOnUpgrade":true,"supportsOnRename":true,"supportsOnHealthIssue":true,"includeHealthWarnings":false,"supportsOnDownloadFailure":false,"supportsOnImportFailure":false,"supportsOnTrackRetag":true,"supportsOnApplicationUpdate":true,"name":"Flac2Custom","fields":[{"name":"path","value":"/usr/local/bin/flac2custom.sh"},{"name":"arguments"}],"implementationName":"Custom Script","implementation":"CustomScript","configContract":"CustomScriptSettings","infoLink":"","message":{"message":"","type":"warning"},"tags":[]}'
     fi
 fi
 
@@ -123,13 +135,15 @@ echo "
 ----------------------------------------------------------------------
 Utilities SETUP
 ----------------------------------------------------------------------
-AUTOCONFIG=$AUTOCONFIG
-----------------------------------------------------------------------
 "
 
-if [ "$AUTOCONFIG" = "true" ]; then
-    if ! isPresent "Clean Downloads" "notification"; then
-        echo "[autoconfig] Configuring flac2custom.sh custom script"
-        apiCall "POST" "notification" '{"onGrab":false,"onReleaseImport":true,"onUpgrade":true,"onRename":false,"onHealthIssue":false,"onDownloadFailure":false,"onImportFailure":false,"onTrackRetag":false,"onApplicationUpdate":false,"supportsOnGrab":true,"supportsOnReleaseImport":true,"supportsOnUpgrade":true,"supportsOnRename":true,"supportsOnHealthIssue":true,"includeHealthWarnings":false,"supportsOnDownloadFailure":false,"supportsOnImportFailure":false,"supportsOnTrackRetag":true,"supportsOnApplicationUpdate":true,"name":"Clean Downloads","fields":[{"name":"path","value":"/usr/local/bin/clean-downloads.sh"},{"name":"arguments"}],"implementationName":"Custom Script","implementation":"CustomScript","configContract":"CustomScriptSettings","infoLink":"","message":{"message":"","type":"warning"},"tags":[]}'
-    fi
+if ! isPresent "Clean Downloads" "notification"; then
+    echo "[autoconfig] Configuring flac2custom.sh custom script"
+    apiCall "POST" "notification" '{"onGrab":false,"onReleaseImport":true,"onUpgrade":true,"onRename":false,"onHealthIssue":false,"onDownloadFailure":false,"onImportFailure":false,"onTrackRetag":false,"onApplicationUpdate":false,"supportsOnGrab":true,"supportsOnReleaseImport":true,"supportsOnUpgrade":true,"supportsOnRename":true,"supportsOnHealthIssue":true,"includeHealthWarnings":false,"supportsOnDownloadFailure":false,"supportsOnImportFailure":false,"supportsOnTrackRetag":true,"supportsOnApplicationUpdate":true,"name":"Clean Downloads","fields":[{"name":"path","value":"/usr/local/bin/clean-downloads.sh"},{"name":"arguments"}],"implementationName":"Custom Script","implementation":"CustomScript","configContract":"CustomScriptSettings","infoLink":"","message":{"message":"","type":"warning"},"tags":[]}'
 fi
+
+echo "
+----------------------------------------------------------------------
+AUTOCONFIG COMPLETE
+----------------------------------------------------------------------
+"
