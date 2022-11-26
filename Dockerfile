@@ -17,9 +17,9 @@ COPY lidarr-flac2mp3/root/usr /usr
 # deemix
 COPY --from=deemix /deemix-server /deemix-server
 RUN chmod +x /deemix-server
-VOLUME "/config_deemix" "/downloads"
+VOLUME ["/config_deemix", "/downloads"]
 EXPOSE 6595
 
 COPY root /
-VOLUME "/config" "/music"
+VOLUME ["/config", "/music"]
 EXPOSE 6595 8686
