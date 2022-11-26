@@ -87,8 +87,9 @@ if [ -z "$plugin" ] || [ "$(echo "$plugin" | jq .updateAvailable)" = "true" ]; t
     fi
     apiCall "POST" "command" '{"name":"InstallPlugin","githubUrl":"'$urlPlugin'"}'
 
-    while "$(apiCall "GET" "system/plugins" | jq '.[]|select(.name=="Deemix").updateAvailable')" -eq "true"; do
-        sleep 0.1
+    while [ -z "$plugin" ] || [ "$(echo "$plugin" | jq .updateAvailable)" = "true" ]; do
+        sleep 1
+        plugin=$(apiCall "GET" "system/plugins" | jq '.[]|select(.name=="Deemix")')
     done
     echo "[autoconfig] Stopping"
     /run/s6/basedir/bin/halt
