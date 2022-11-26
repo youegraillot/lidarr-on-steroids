@@ -76,14 +76,22 @@ apiKey="$(curl \
     $url/initialize.js |
     sed -n "s/apiKey: '\(.*\)'.*/\1/p")"
 
-if ! isPresent $urlPlugin "system/plugins"; then
-    echo "[autoconfig] Installing plugin"
+plugin=$(apiCall "GET" "system/plugins" | jq '.[]|select(.name=="Deemix")')
+
+if [ -z "$plugin" ] || [ "$(echo "$plugin" | jq .updateAvailable)" = "true" ]; then
+    echo "[autoconfig] Installing / Updating Deemix plugin"
     githubRate=$(curl -s https://api.github.com/rate_limit | jq .rate)
     if [ "$(echo "$githubRate" | jq .remaining)" = "60" ]; then
         echo "[autoconfig] Waiting github rate limit reset"
         sleep $(( $(echo "$githubRate" | jq .reset) - $(date +%s) + 5 ))
     fi
     apiCall "POST" "command" '{"name":"InstallPlugin","githubUrl":"'$urlPlugin'"}'
+
+    while "$(apiCall "GET" "system/plugins" | jq '.[]|select(.name=="Deemix").updateAvailable')" -eq "true"; do
+        sleep 0.1
+    done
+    echo "[autoconfig] Stopping"
+    /run/s6/basedir/bin/halt
 fi
 if ! isPresent "path" "rootFolder"; then
     echo "[autoconfig] Setting /music rootFolder"
