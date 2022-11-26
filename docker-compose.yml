@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   lidarr-onsteroids:
-    image: lidarr-on-steroids
+    image: youegraillot/lidarr-on-steroids
     build:
       context: .
     environment:

@@ -21,5 +21,6 @@ VOLUME ["/config_deemix", "/downloads"]
 EXPOSE 6595
 
 COPY root /
+RUN chmod +x /etc/services.d/*/run
 VOLUME ["/config", "/music"]
 EXPOSE 6595 8686
