@@ -81,9 +81,10 @@ plugin=$(apiCall "GET" "system/plugins" | jq '.[]|select(.name=="Deemix")')
 if [ -z "$plugin" ] || [ "$(echo "$plugin" | jq .updateAvailable)" = "true" ]; then
     echo "[autoconfig] Installing / Updating Deemix plugin"
     githubRate=$(curl -s https://api.github.com/rate_limit | jq .rate)
-    if [ "$(echo "$githubRate" | jq .remaining)" = "60" ]; then
-        echo "[autoconfig] Waiting github rate limit reset"
-        sleep $(( $(echo "$githubRate" | jq .reset) - $(date +%s) + 5 ))
+    if [ "$(echo "$githubRate" | jq .remaining)" = "0" ]; then
+        deltaGithubResetTime=$(( $(echo "$githubRate" | jq .reset) - $(date +%s) + 5 ))
+        echo "[autoconfig] Waiting github rate limit reset : $deltaGithubResetTime seconds"
+        sleep $deltaGithubResetTime
     fi
     apiCall "POST" "command" '{"name":"InstallPlugin","githubUrl":"'$urlPlugin'"}'
 
