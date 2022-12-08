@@ -23,16 +23,26 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**System info (please complete the following information):**
+ - OS: [e.g. windows, ubuntu]
+ - Container engine [e.g. docker 20.10]
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**docker-compose.yml (please complete the following information):**
+```yml
+version: "3"
+services:
+  lidarr:
+    image: youegraillot/lidarr-on-steroids
+    restart: unless-stopped
+    ports:
+      - "8686:8686" # Lidarr web UI
+      - "6595:6595" # Deemix web UI
+    volumes:
+      - <path>:/config
+      - <path>:/config_deemix
+      - <path>:/downloads
+      - <path>:/music
+```
 
 **Additional context**
 Add any other context about the problem here.
