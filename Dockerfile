@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/bockiii/deemix-docker:latest@sha256:0462f4be1e04866c3efc999aa0571ec98f3aced99793a9b586f1a36f2b97febe as deemix
+FROM registry.gitlab.com/bockiii/deemix-docker:latest@sha256:d325660d833c30c8bbb5cf0caa75135b42a2f69b82f2269fd5bea91a04c449e6 as deemix
 
 FROM cr.hotio.dev/hotio/lidarr:pr-plugins-1.1.2.2826
 
