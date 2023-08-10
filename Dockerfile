@@ -1,4 +1,15 @@
-FROM registry.gitlab.com/bockiii/deemix-docker:latest@sha256:d325660d833c30c8bbb5cf0caa75135b42a2f69b82f2269fd5bea91a04c449e6 as deemix
+FROM node:alpine as Deemix
+
+RUN apk add git jq && \
+    git clone https://gitlab.com/RemixDev/deemix-gui.git && cd deemix-gui && \
+    git submodule update --init --recursive && yarn install-all && \
+    jq '.pkg.targets = ["node16-alpine-x64"]' ./server/package.json > tmp-json && \
+    mv tmp-json /deemix-gui/server/package.json && \
+    \
+    # Patching deemix: see issue https://github.com/youegraillot/lidarr-on-steroids/issues/63
+    sed -i 's/const channelData = await dz.gw.get_page(channelName)/let channelData; try { channelData = await dz.gw.get_page(channelName); } catch (error) { console.error(`Caught error ${error}`); return [];}/' ./server/src/routes/api/get/newReleases.ts && \
+    yarn dist-server && mv /deemix-gui/dist/deemix-server /deemix-server
+
 
 FROM cr.hotio.dev/hotio/lidarr:pr-plugins-1.3.0.3322
 
