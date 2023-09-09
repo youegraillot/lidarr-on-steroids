@@ -11,7 +11,7 @@ RUN apk add git jq && \
     yarn dist-server && mv /deemix-gui/dist/deemix-server /deemix-server
 
 
-FROM cr.hotio.dev/hotio/lidarr:pr-plugins-1.3.0.3322
+FROM cr.hotio.dev/hotio/lidarr:pr-plugins-1.4.1.3564
 
 LABEL maintainer="youegraillot"
 
