@@ -69,23 +69,25 @@ echo "[autoconfig] Waiting Lidarr to launch on 8686..."
 while ! nc -z localhost 8686; do
     sleep 0.1
 done
+
 apiKey="$(curl \
     -sS \
     --retry-all-errors \
     --retry 10 \
-    $url/initialize.js |
-    sed -n "s/apiKey: '\(.*\)'.*/\1/p")"
+    $url/initialize.json |
+    jq -r '.apiKey')"
 
 plugin=$(apiCall "GET" "system/plugins" | jq '.[]|select(.name=="Deemix")')
 
 if [ -z "$plugin" ] || [ "$(echo "$plugin" | jq .updateAvailable)" = "true" ]; then
-    echo "[autoconfig] Installing / Updating Deemix plugin"
+    echo "[autoconfig] Checking github rate"
     githubRate=$(curl -s https://api.github.com/rate_limit | jq .rate)
     if [ "$(echo "$githubRate" | jq .remaining)" = "0" ]; then
         deltaGithubResetTime=$(( $(echo "$githubRate" | jq .reset) - $(date +%s) + 5 ))
         echo "[autoconfig] Waiting github rate limit reset : $deltaGithubResetTime seconds"
         sleep $deltaGithubResetTime
     fi
+    echo "[autoconfig] Installing / Updating Deemix plugin"
     apiCall "POST" "command" '{"name":"InstallPlugin","githubUrl":"'$urlPlugin'"}'
 
     while [ -z "$plugin" ] || [ "$(echo "$plugin" | jq .updateAvailable)" = "true" ]; do
@@ -103,7 +105,7 @@ loginPath="/config_deemix/login.json"
 echo "[autoconfig] Waiting for $loginPath to be filled..."
 while [ -z "$arl" ]; do
     sleep 1
-    arl=$(sed -n 's/.*arl.*"\(.*\)"/\1/p' "$loginPath" 2>/dev/null)
+    arl=$(jq -r '.arl' "$loginPath")
 done
 if [ "$(apiCall "GET" "delayprofile" | jq .[0].items[2].allowed)" = "false" ]; then
     echo "[autoconfig] Allowing Deemix in default delay profile"
