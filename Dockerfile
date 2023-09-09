@@ -1,4 +1,4 @@
-FROM node:alpine as Deemix
+FROM docker.io/library/node:alpine as deemix
 
 RUN apk add git jq && \
     git clone https://gitlab.com/RemixDev/deemix-gui.git && cd deemix-gui && \
