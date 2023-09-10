@@ -27,7 +27,8 @@ This allows an easy deployment, with the advantage of having a direct control ov
 | `-e PUID=1000` | for UserID |
 | `-e PGID=1000` | for GroupID |
 | `-e AUTOCONFIG=true` | Enable automatic configuration - see below for explanation |
-| `-e FLAC2CUSTOM_ARGS=true` | Sets arguments used when calling flac2custom.sh |
+| `-e FLAC2CUSTOM_ARGS=""` | Sets arguments used when calling flac2custom.sh |
+| `-e CLEAN_DOWNLOADS=true` | Enable cleaning empty folders in /downloads |
 | `-v /config` | Configuration files for Lidarr. |
 | `-v /config_deemix` | Configuration files for Deemix. |
 | `-v /downloads` | Path to your download folder for music. |

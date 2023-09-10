@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ "$CLEAN_DOWNLOADS" != "true" ]; then
+    exit
+fi
+
 echo "Info|Lidarr event: $lidarr_eventtype" >&2
 
 # Handle Lidarr Test event
