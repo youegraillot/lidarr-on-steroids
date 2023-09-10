@@ -11,8 +11,8 @@ services:
       - "8686:8686" # Lidarr web UI
       - "6595:6595" # Deemix web UI
     volumes:
-      - ./config:/config
-      - ./config_deemix:/config_deemix
-      - ./downloads:/downloads
-      - ./music:/music
-    restart: unless-stopped
+      - ./tmp/config:/config
+      - ./tmp/config_deemix:/config_deemix
+      - ./tmp/downloads:/downloads
+      - ./tmp/music:/music
+    restart: always
