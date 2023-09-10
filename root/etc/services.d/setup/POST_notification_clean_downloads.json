@@ -1,0 +1,40 @@
+{
+    "onGrab": false,
+    "onReleaseImport": true,
+    "onUpgrade": true,
+    "onRename": false,
+    "onHealthIssue": false,
+    "onDownloadFailure": false,
+    "onImportFailure": false,
+    "onTrackRetag": false,
+    "onApplicationUpdate": false,
+    "supportsOnGrab": true,
+    "supportsOnReleaseImport": true,
+    "supportsOnUpgrade": true,
+    "supportsOnRename": true,
+    "supportsOnHealthIssue": true,
+    "includeHealthWarnings": false,
+    "supportsOnDownloadFailure": false,
+    "supportsOnImportFailure": false,
+    "supportsOnTrackRetag": true,
+    "supportsOnApplicationUpdate": true,
+    "name": "Clean Downloads",
+    "fields": [
+        {
+            "name": "path",
+            "value": "/usr/local/bin/clean-downloads.sh"
+        },
+        {
+            "name": "arguments"
+        }
+    ],
+    "implementationName": "Custom Script",
+    "implementation": "CustomScript",
+    "configContract": "CustomScriptSettings",
+    "infoLink": "",
+    "message": {
+        "message": "",
+        "type": "warning"
+    },
+    "tags": []
+}

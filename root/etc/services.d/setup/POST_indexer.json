@@ -1,0 +1,29 @@
+{
+    "enableRss": true,
+    "enableAutomaticSearch": true,
+    "enableInteractiveSearch": true,
+    "supportsRss": true,
+    "supportsSearch": true,
+    "protocol": "DeemixDownloadProtocol",
+    "priority": 25,
+    "downloadClientId": 0,
+    "name": "Deemix",
+    "fields": [
+        {
+            "name": "baseUrl",
+            "value": "http://localhost:6595"
+        },
+        {
+            "name": "arl",
+            "value": ""
+        },
+        {
+            "name": "earlyReleaseLimit"
+        }
+    ],
+    "implementationName": "Deemix",
+    "implementation": "Deemix",
+    "configContract": "DeemixIndexerSettings",
+    "infoLink": "https://wiki.servarr.com/lidarr/supported#deemix",
+    "tags": []
+}

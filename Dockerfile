@@ -1,4 +1,5 @@
 FROM docker.io/library/node:16-alpine as deemix
+
 ARG TARGETPLATFORM=linux/amd64
 
 RUN apk add --no-cache git jq python3 make gcc musl-dev g++ && \
@@ -41,7 +42,13 @@ RUN chmod +x /deemix-server
 VOLUME ["/config_deemix", "/downloads"]
 EXPOSE 6595
 
+# arl-watch
+RUN apk add --no-cache inotify-tools && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY root /
-RUN chmod +x /etc/services.d/*/run
+RUN chmod +x /etc/services.d/*/run && \
+    chmod +x /usr/local/bin/*.sh
+
 VOLUME ["/config", "/music"]
 EXPOSE 6595 8686

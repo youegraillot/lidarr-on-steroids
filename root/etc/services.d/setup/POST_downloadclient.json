@@ -1,0 +1,34 @@
+{
+    "enable": true,
+    "protocol": "DeemixDownloadProtocol",
+    "priority": 1,
+    "removeCompletedDownloads": true,
+    "removeFailedDownloads": true,
+    "name": "Deemix",
+    "fields": [
+        {
+            "name": "host",
+            "value": "localhost"
+        },
+        {
+            "name": "port",
+            "value": 6595
+        },
+        {
+            "name": "urlBase"
+        },
+        {
+            "name": "useSsl",
+            "value": false
+        },
+        {
+            "name": "arl",
+            "value": ""
+        }
+    ],
+    "implementationName": "Deemix",
+    "implementation": "Deemix",
+    "configContract": "DeemixSettings",
+    "infoLink": "https://wiki.servarr.com/lidarr/supported#deemix",
+    "tags": []
+}

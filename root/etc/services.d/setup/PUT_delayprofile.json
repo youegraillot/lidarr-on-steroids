@@ -1,0 +1,25 @@
+{
+    "name": "Default",
+    "items": [
+        {
+            "name": "Usenet",
+            "protocol": "UsenetDownloadProtocol",
+            "allowed": true,
+            "delay": 0
+        },
+        {
+            "name": "Torrent",
+            "protocol": "TorrentDownloadProtocol",
+            "allowed": true,
+            "delay": 0
+        },
+        {
+            "name": "Deemix",
+            "protocol": "DeemixDownloadProtocol",
+            "allowed": true,
+            "delay": 0
+        }
+    ],
+    "tags": [],
+    "id": 1
+}
