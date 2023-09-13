@@ -2,6 +2,7 @@ FROM docker.io/library/node:16-alpine as deemix
 
 ARG TARGETPLATFORM=linux/amd64
 
+RUN echo "Building for TARGETPLATFORM=$TARGETPLATFORM"
 RUN apk add --no-cache git jq python3 make gcc musl-dev g++ && \
     rm -rf /var/lib/apt/lists/*
 RUN git clone --recurse-submodules https://gitlab.com/RemixDev/deemix-gui.git
