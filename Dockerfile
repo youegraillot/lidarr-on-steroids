@@ -1,8 +1,9 @@
-FROM docker.io/library/node:16-alpine as deemix
+FROM --platform=$TARGETPLATFORM docker.io/library/node:16-alpine as deemix
 
-ARG TARGETPLATFORM=linux/amd64
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 
-RUN echo "Building for TARGETPLATFORM=$TARGETPLATFORM"
+RUN echo "Building for TARGETPLATFORM=$TARGETPLATFORM | BUILDPLATFORM=$BUILDPLATFORM"
 RUN apk add --no-cache git jq python3 make gcc musl-dev g++ && \
     rm -rf /var/lib/apt/lists/*
 RUN git clone --recurse-submodules https://gitlab.com/RemixDev/deemix-gui.git
@@ -13,7 +14,7 @@ RUN case "$TARGETPLATFORM" in \
         "linux/arm64") \
             jq '.pkg.targets = ["node16-alpine-arm64"]' ./server/package.json > tmp-json ;; \
         *) \
-            echo "Platform not supported" && exit 1 ;; \
+            echo "Platform $TARGETPLATFORM not supported" && exit 1 ;; \
     esac && \
     mv tmp-json /deemix-gui/server/package.json
 RUN yarn install-all
