@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM docker.io/library/node:16-alpine as deemix
+FROM --platform=$TARGETPLATFORM docker.io/library/node:21-alpine as deemix
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
